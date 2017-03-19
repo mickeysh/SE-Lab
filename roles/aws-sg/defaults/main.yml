@@ -1,0 +1,6 @@
+# Tags to set on the security groups
+security_group_resource_tags: {
+  "Name": "{{ item.item.name }}"
+  }
+
+ec2_group_state: "present"

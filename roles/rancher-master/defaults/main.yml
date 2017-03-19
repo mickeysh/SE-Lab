@@ -1,0 +1,6 @@
+---
+# defaults file for rancher
+mysql_database: cattle
+mysql_user: cattle
+mysql_password: cattle
+mysql_port: 3306

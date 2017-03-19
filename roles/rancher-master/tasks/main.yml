@@ -1,0 +1,45 @@
+---
+# tasks file for rancher
+# install rancher HA
+
+- name: Rancher Master | Install Rancher | Install pip
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  become: true
+  become_method: sudo
+  with_items:
+    - python-pip
+
+- name: Rancher Master | Install Rancher | Install Docker python module
+  pip:
+    name: docker-py
+  become: true
+  become_method: sudo
+
+- debug: var=hostvars[groups['mysql_server'][0]]
+
+- set_fact:
+    db_host: "{{ hostvars[groups['mysql_server'][0]]['ec2_ip_address'] }}"
+
+- debug: var=db_host
+
+- name: Rancher Master | Install Rancher | Run the Rancher master container
+  docker_container:
+    name: rancher
+    image: rancher/server
+    state: started
+    restart_policy: unless-stopped
+    detach: true
+    ports:
+      - "8080:8080"
+      - "9345:9345"
+    command: --db-host {{ db_host }} --advertise-address {{ inventory_hostname }}
+#    env:
+#      CATTLE_DB_CATTLE_MYSQL_HOST="{{ hostvars[groups['mysql_server'][0]]['ec2_ip_address'] }}"
+#      CATTLE_DB_CATTLE_MYSQL_NAME={{ mysql_database }}
+#      CATTLE_DB_CATTLE_MYSQL_PORT={{ mysql_port }}
+#      CATTLE_DB_CATTLE_USERNAME={{ mysql_user }}
+#      CATTLE_DB_CATTLE_PASSWORD={{ mysql_password }}
+#      CATTLE_CLUSTER_ADVERTISE_ADDRESS={{ inventory_hostname }}

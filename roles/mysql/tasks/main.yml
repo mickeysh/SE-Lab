@@ -1,0 +1,72 @@
+---
+# tasks file for mysql
+
+- name: MySQL | Install MySQL | Install Package
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  become: true
+  become_method: sudo
+  with_items:
+    - mysql-server
+
+- name: MySQL | Install MySQL | Start service
+  service:
+    name: mysql
+    state: started
+
+
+- name: MySQL | Install MySQL | Install packages required for ansible mysql modules on Ubuntu 16.04
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  become: true
+  become_method: sudo
+  with_items:
+    - python3-dev
+    - libmysqlclient-dev
+    - python3-pip
+
+- name: MySQL | Install MySQL | Install the Python package required for ansible MySQL modules on Ubuntu 16.04
+  pip:
+    name: mysqlclient
+  become: true
+  become_method: sudo
+
+- name: MySQL | Install MySQL | Copy the database file to the server
+  copy:
+    src: rancher.sql
+    dest: /tmp/rancher.sql
+    owner: root
+    group: root
+    mode: 0777
+  become: true
+  become_method: sudo
+
+- name: MySQL | Install MySQL | Create the Rancher database
+  mysql_db:
+    name: all
+    state: import
+    target: /tmp/rancher.sql
+  become: true
+  become_method: sudo
+
+
+- name: MySQL | Install MySQL | Copy the mysqld.cnf file
+  copy:
+    src: mysqld.cnf
+    dest: /etc/mysql/mysql.conf.d/
+    owner: root
+    group: root
+    mode: 0777
+  become: true
+  become_method: sudo
+
+- name: MySQL | Install MySQL | Restart MySQL Server
+  service:
+    name: mysql
+    state: restarted
+  become: true
+  become_method: sudo

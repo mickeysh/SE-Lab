@@ -1,0 +1,51 @@
+---
+# tasks file for awd-elb
+- name: AWS | Provision ELB | Create a new ELB
+  ec2_elb_lb:
+    name: "{{ elb_name }}"
+    ec2_access_key: "{{ ec2_access_key }}"
+    ec2_secret_key: "{{ ec2_secret_key }}"
+    security_group_names: "{{ elb_security_group_name }}"
+    state: present
+    region: "{{ vpc_region }}"
+    subnets: "{{ elb_subnet_id }}"
+    purge_subnets: "{{ elb_purge_subnets }}"
+    cross_az_load_balancing: "{{ elb_cross_az_load_balancing }}"
+    connection_draining_timeout: "{{ elb_connection_draining_timeout }}"
+    listeners: "{{ elb_listeners }}"
+    stickiness: "{{ elb_stickiness }}"
+    health_check: "{{ elb_health_check }}"
+  register: elb
+
+- name: AWS | Provision ELB | Gather EC2 facts.
+  ec2_remote_facts:
+    aws_access_key: "{{ ec2_access_key }}"
+    aws_secret_key: "{{ ec2_secret_key }}"
+    region: "{{ vpc_region }}"
+    filters:
+      instance-state-name: running
+      "tag:Name": rancher_master
+  register: instances_id_list
+
+- name: AWS | Provision ELB | Adding EC2 instance(s) to the ELB
+  ec2_elb:
+    region: "{{ vpc_region }}"
+    ec2_elbs: "{{ elb_name }}"
+    instance_id: "{{ item.id }}"
+    wait: yes
+    state: present
+  with_items: "{{ instances_id_list.instances }}"
+  ignore_errors: yes
+
+- name: Rancher Host | Install Rancher | Get Rancher ELB DNS
+  ec2_elb_facts:
+    region: "{{ ec2_region }}"
+    aws_access_key: "{{ ec2_access_key }}"
+    aws_secret_key: "{{ ec2_secret_key }}"
+    names: "{{ elb_name }}"
+  register: elb_facts
+
+- name: AWS | Provision EC2 | Add new instance to host group
+  add_host:
+    hostname: "{{ elb_facts.elbs.0.dns_name }}"
+    groups: "{{ elb_name }}"

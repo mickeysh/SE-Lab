@@ -1,0 +1,7 @@
+- name: "AWS | Provision Security Groups | Check VPC region has been defined (vpc_region)"
+  fail: msg="You must specify the region in which you created the VPC, e.g. eu-west-1"
+  when: vpc_region is undefined
+
+- name: "AWS | Provision Security Groups | Check inbound security groups have been defined (ec2_group_sg)"
+  fail: msg="You must specify a list of security groups to create, see README for more information"
+  when: ec2_sg is undefined

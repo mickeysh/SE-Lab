@@ -1,0 +1,97 @@
+---
+- name: AWS | Provision all required infrastructure
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/aws-general.yml
+    - vars/aws-access.yml
+    - vars/aws-ec2-hosts.yml
+    - vars/aws-sg.yml
+  gather_facts: no
+  roles:
+    # Provision security groups
+    - {
+        role: aws-sg,
+        vpc_region: "{{ ec2_region }}",
+        access_key: "{{ ec2_access_key }}",
+        secret_key: "{{ ec2_secret_key }}",
+    #   ec2_group_state: "absent",
+        ec2_sg: "{{ security_groups }}"
+      }
+    - {
+        role: aws-ec2,
+        vpc_region: "{{ ec2_region }}",
+        access_key: "{{ ec2_access_key }}",
+        secret_key: "{{ ec2_secret_key }}",
+    #   ec2_group_state: "absent",
+        ec2_list: "{{ rancher_hosts }}"
+      }
+    - {
+        role: aws-ec2,
+        vpc_region: "{{ ec2_region }}",
+        access_key: "{{ ec2_access_key }}",
+        secret_key: "{{ ec2_secret_key }}",
+    #   ec2_group_state: "absent",
+        ec2_list: "{{ kubernetes_hosts }}"
+      }
+    - {
+        role: aws-ec2,
+        vpc_region: "{{ ec2_region }}",
+        access_key: "{{ ec2_access_key }}",
+        secret_key: "{{ ec2_secret_key }}",
+    #   ec2_group_state: "absent",
+        ec2_list: "{{ rancher_masters }}"
+      }
+    - {
+        role: aws-elb,
+        elb_name: rancherelb,
+        vpc_region: "{{ ec2_region }}",
+        access_key: "{{ ec2_access_key }}",
+        secret_key: "{{ ec2_secret_key }}",
+        elb_security_group_name: 'web',
+        elb_subnet_id: "{{subnet_id}}",
+      }
+    - {
+        role: aws-ec2,
+        vpc_region: "{{ ec2_region }}",
+        access_key: "{{ ec2_access_key }}",
+        secret_key: "{{ ec2_secret_key }}",
+    #   ec2_group_state: "absent",
+        ec2_list: "{{ mysql_server }}"
+      }
+
+  tasks:
+    - name: Refresh EC2 dynamic inventory
+      shell: /etc/ansible/ec2.py --refresh-cache
+
+- name: Install python 2.7 on tall EC2 hosts
+  hosts: ec2
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - raw: apt-get install -y python2.7 python-simplejson
+      become: true
+      become_method: sudo
+
+- name: Install Rancher on AWS hosts
+  hosts: tag_Docker_True
+  roles:
+    - docker
+
+- name: Install MySQL on the server
+  hosts: tag_Name_mysql_server
+  roles:
+    - mysql
+
+- name: Install Rancher on the server
+  hosts: tag_Name_rancher_master
+  roles:
+    - rancher-master
+
+- name: elb_facts
+  hosts: tag_Name_rancher_host
+  roles:
+    - {
+        role: rancher-host,
+        rancher_elb_name: rancherelb,
+      }

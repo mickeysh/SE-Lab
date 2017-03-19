@@ -1,0 +1,10 @@
+---
+- name: test
+  hosts: localhost
+  roles:
+    - {
+        role: rancher-kubernetes,
+        project_name: kubernetes,
+        rancher_server: ,
+        rancher_port: 8080
+      }

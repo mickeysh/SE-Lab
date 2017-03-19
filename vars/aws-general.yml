@@ -1,0 +1,6 @@
+---
+ec2_region: "us-east-2"
+subnet_id: subnet-9b64def2
+instances_keypair: Demo_Ohio
+my_vpc_cidr: "172.40.0.0/16"
+everywhere_cidr: "0.0.0.0/0"

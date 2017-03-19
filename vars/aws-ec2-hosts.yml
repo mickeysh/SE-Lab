@@ -1,0 +1,59 @@
+---
+# EC2 Rancher hosts list
+rancher_hosts:
+  - instance_type: t2.micro
+    image: "{{ linux_image_id }}"
+    assign_public_ip: true
+    keypair: "{{instances_keypair}}"
+    group: ['ssh','web','rancher','ping']
+    vpc_subnet_id: "{{subnet_id}}"
+    instance_tags:
+        Name: rancher_host
+        Docker: yes
+    exact_count: 2
+    count_tag:
+        Name: rancher_host
+
+# EC2 Rancher hosts list
+kubernetes_hosts:
+  - instance_type: t2.micro
+    image: "{{ linux_image_id }}"
+    assign_public_ip: true
+    keypair: "{{instances_keypair}}"
+    group: ['ssh','web','rancher','ping']
+    vpc_subnet_id: "{{subnet_id}}"
+    instance_tags:
+        Name: kubernetes_host
+        Docker: yes
+    exact_count: 3
+    count_tag:
+        Name: kubernetes_host
+
+# EC2 Rancher master list
+rancher_masters:
+  - instance_type: t2.micro
+    image: "{{ linux_image_id }}"
+    assign_public_ip: true
+    keypair: "{{instances_keypair}}"
+    group: ['ssh','web','rancher','ping','rancher_master']
+    vpc_subnet_id: "{{subnet_id}}"
+    instance_tags:
+        Name: rancher_master
+        Docker: yes
+    exact_count: 3
+    count_tag:
+        Name: rancher_master
+
+# MySQL Server
+mysql_server:
+  - instance_type: t2.micro
+    image: "{{ linux_image_id }}"
+    assign_public_ip: true
+    keypair: "{{instances_keypair}}"
+    group: ['ssh','web','mysql','ping']
+    vpc_subnet_id: "{{subnet_id}}"
+    instance_tags:
+        Name: mysql_server
+    exact_count: 1
+    count_tag:
+        Name: mysql_server

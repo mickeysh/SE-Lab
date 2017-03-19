@@ -1,0 +1,4 @@
+---
+# defaults file for aws
+assign_public_ip: yes
+linux_image_id: ami-fcc19b99

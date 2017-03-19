@@ -1,0 +1,81 @@
+---
+# Create security groups list
+security_groups:
+  - name: ssh
+    desc: the security group for ssh
+    rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "{{ everywhere_cidr }}"
+    rules_egress:
+      - proto: all
+        cidr_ip: "{{ everywhere_cidr }}"
+
+  - name: web
+    desc: the security group for the web server
+    rules:
+      - proto: tcp
+        from_port: "8080"
+        to_port: "8080"
+        cidr_ip: "{{ everywhere_cidr }}"
+      - proto: tcp
+        from_port: "80"
+        to_port: "80"
+        cidr_ip: "{{ everywhere_cidr }}"
+      - proto: tcp
+        from_port: "443"
+        to_port: "443"
+        cidr_ip: "{{ everywhere_cidr }}"
+    rules_egress:
+      - proto: all
+        cidr_ip: "{{ everywhere_cidr }}"
+
+
+  - name: rancher
+    desc: the security group for rancher hosts
+    rules:
+      - proto: udp
+        from_port: "500"
+        to_port: "500"
+        cidr_ip: "{{ everywhere_cidr }}"
+      - proto: udp
+        from_port: "4500"
+        to_port: "4500"
+        cidr_ip: "{{ everywhere_cidr }}"
+    rules_egress:
+      - proto: all
+        cidr_ip: "{{ everywhere_cidr }}"
+
+  - name: rancher_master
+    desc: the security group for rancher masters
+    rules:
+      - proto: tcp
+        from_port: "9345"
+        to_port: "9345"
+        cidr_ip: "{{ everywhere_cidr }}"
+    rules_egress:
+      - proto: all
+        cidr_ip: "{{ everywhere_cidr }}"
+
+  - name: ping
+    desc: the security group for ping hosts
+    rules:
+      - proto: icmp
+        from_port: -1
+        to_port: -1
+        cidr_ip: "{{ everywhere_cidr }}"
+    rules_egress:
+      - proto: all
+        cidr_ip: "{{ everywhere_cidr }}"
+
+  - name: mysql
+    desc: the security group for mysql hosts
+    rules:
+      - proto: tcp
+        from_port: 3306
+        to_port: 3306
+        cidr_ip: "{{ everywhere_cidr }}"
+    rules_egress:
+      - proto: all
+        cidr_ip: "{{ everywhere_cidr }}"

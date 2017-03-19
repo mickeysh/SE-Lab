@@ -1,0 +1,41 @@
+---
+# tasks file for rancher-kubernetes
+
+- name: Kubernetes Host | Install Kubernetes | Get Kubernetes project template
+  uri:
+    method: GET
+    url: "http://{{ rancher_server }}:{{ rancher_port }}/v2-beta/projectTemplates?name=kubernetes"
+    return_content: yes
+  register: rancher_token_url
+
+- name: Kubernetes Host | Install Kubernetes | Save the K8S project template
+  set_fact:
+    k8s_template: "{{ rancher_token_url['json']['data'][0]['id'] }}"
+
+- name: Kubernetes Host | Install Kubernetes | Create a Rancher K8S project
+  uri:
+    method: POST
+    status_code: 201
+    body: '{"description":"{{ project_name }}", "name":"{{ project_name }}", "projectTemplateId":"{{ k8s_template }}", "virtualMachine":false, "servicesPortRange":null}'
+    body_format: json
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    url: http://{{ rancher_server }}:{{ rancher_port }}/v2-beta/projects
+  register: create_project
+
+- name: Kubernetes Host | Install Kubernetes | Register project id
+  set_fact:
+    kubernetes_project_id: "{{ create_project.json['id'] }}"
+
+- name: Kubernetes Host | Install Kubernetes | Create API KEY
+  uri:
+    method: POST
+    status_code: 201
+    body: ' {"name":"{{ project_name }}_key", "description":"{{ project_name }}_key"}'
+    body_format: json
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    url: http://{{ rancher_server }}:{{ rancher_port }}/v2-beta/apikeys
+  register: api_key
