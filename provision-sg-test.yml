@@ -65,6 +65,8 @@
   tasks:
     - name: Refresh EC2 dynamic inventory
       shell: /etc/ansible/ec2.py --refresh-cache
+    - name: Wait for the dynmaic inventory refresh
+      wait_for: timeout=60
 
 - name: Install python 2.7 on tall EC2 hosts
   hosts: ec2
@@ -93,10 +95,14 @@
   hosts: tag_Name_rancher_master
   roles:
     - rancher-master
+  tags:
+    - rancher-master
 
 - name: Install default Rancher hosts
   hosts: tag_Name_rancher_host
   roles:
+    - rancher-host
+  tags:
     - rancher-host
 
 - name: Create kubenetes project in rancher
@@ -106,12 +112,25 @@
         role: rancher-kubernetes,
         project_name: kubernetes
       }
+  tags:
+    - rancher-host
+
+- name: Install Kubenetes Rancher hosts
+  hosts: tag_Name_kubernetes_host
+  tasks:
+    - name: Intall docker
+      shell: curl https://releases.rancher.com/install-docker/1.12.sh | sh
+      become: true
+      become_method: sudo
+  tags:
+    - rancher-host
 
 - name: Install Kubenetes Rancher hosts
   hosts: tag_Name_kubernetes_host
   roles:
     - {
         role: rancher-host,
-        rancher_project_name: kubernetes,
-
+        rancher_project_name: kubernetes
       }
+  tags:
+    - rancher-host

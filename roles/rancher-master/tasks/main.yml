@@ -18,8 +18,6 @@
   become: true
   become_method: sudo
 
-- debug: var=hostvars[groups['mysql_server'][0]]
-
 - set_fact:
     db_host: "{{ hostvars[groups['mysql_server'][0]]['ec2_ip_address'] }}"
 

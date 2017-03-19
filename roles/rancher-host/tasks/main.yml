@@ -35,6 +35,9 @@
     url: "http://{{ rancher_server }}:{{ rancher_port }}/v2-beta/project?name={{ rancher_project_name }}"
     return_content: yes
   register: rancher_project_url
+  until: rancher_project_url.status == 200
+  retries: 10
+  delay: 60
 
 - debug: var=rancher_project_url.json.data.0.id
 
