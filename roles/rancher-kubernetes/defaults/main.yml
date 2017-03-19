@@ -1,2 +1,4 @@
 ---
 # defaults file for rancher-kubernetes
+rancher_server: 127.0.0.1
+rancher_port: 8080
