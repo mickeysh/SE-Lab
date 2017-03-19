@@ -1,5 +1,9 @@
 ---
 # tasks file for rancher-kubernetes
+- set_fact:
+    rancher_server: "{{ hostvars[groups['rancherelb'][0]].inventory_hostname }}"
+
+- debug: var=rancher_server
 
 - name: Kubernetes Host | Install Kubernetes | Get Kubernetes project template
   uri:
