@@ -5,3 +5,4 @@ rancher_port: 8080
 rancher_agent_name: "agent"
 rancher_agent_version: 1.2.1
 rancher_project_id: 1a5
+rancher_project_name: Default
