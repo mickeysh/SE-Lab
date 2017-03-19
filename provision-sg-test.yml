@@ -59,6 +59,8 @@
     #   ec2_group_state: "absent",
         ec2_list: "{{ mysql_server }}"
       }
+  tags:
+    - aws
 
   tasks:
     - name: Refresh EC2 dynamic inventory
@@ -77,10 +79,14 @@
   hosts: tag_Docker_True
   roles:
     - docker
+  tags:
+    - docker
 
 - name: Install MySQL on the server
   hosts: tag_Name_mysql_server
   roles:
+    - mysql
+  tags:
     - mysql
 
 - name: Install Rancher on the server
@@ -88,10 +94,24 @@
   roles:
     - rancher-master
 
-- name: elb_facts
+- name: Install default Rancher hosts
   hosts: tag_Name_rancher_host
+  roles:
+    - rancher-host
+
+- name: Create kubenetes project in rancher
+  hosts: localhost
+  roles:
+    - {
+        role: rancher-kubernetes,
+        project_name: kubernetes
+      }
+
+- name: Install Kubenetes Rancher hosts
+  hosts: tag_Name_kubernetes_host
   roles:
     - {
         role: rancher-host,
-        rancher_elb_name: rancherelb,
+        rancher_project_name: kubernetes,
+
       }
