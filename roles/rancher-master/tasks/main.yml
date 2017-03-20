@@ -18,10 +18,14 @@
   become: true
   become_method: sudo
 
+#- set_fact:
+#    db_host: "{{ hostvars[groups['mysql_server'][0]]['ec2_ip_address'] }}"
+
 - set_fact:
-    db_host: "{{ hostvars[groups['mysql_server'][0]]['ec2_ip_address'] }}"
+    db_host: "{{ hostvars[groups['tag_Name_mysql_server'][0]]['ansible_all_ipv4_addresses'][0] }}"
 
 - debug: var=db_host
+- debug: var=ansible_default_ipv4.address
 
 - name: Rancher Master | Install Rancher | Run the Rancher master container
   docker_container:
@@ -33,7 +37,7 @@
     ports:
       - "8080:8080"
       - "9345:9345"
-    command: --db-host {{ db_host }} --advertise-address {{ inventory_hostname }}
+    command: --db-host {{ db_host }} --advertise-address {{ ansible_default_ipv4.address }}
 #    env:
 #      CATTLE_DB_CATTLE_MYSQL_HOST="{{ hostvars[groups['mysql_server'][0]]['ec2_ip_address'] }}"
 #      CATTLE_DB_CATTLE_MYSQL_NAME={{ mysql_database }}

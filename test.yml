@@ -1,10 +1,7 @@
 ---
-- name: Install Kubenetes Rancher hosts
-  hosts: tag_Name_kubernetes_host
+- name: Install NFS on docker hosts
+  hosts: tag_Name_rancher_master
   tasks:
-    - name: Intall docker
-      shell: curl https://releases.rancher.com/install-docker/1.12.sh | sh
-      become: true
-      become_method: sudo
-  tags:
-    - rancher-host
+    - name: Intall NFS
+      debug: var=hostvars[groups['tag_Name_mysql_server'][0]]
+      debug: var=ansible_default_ipv4.address

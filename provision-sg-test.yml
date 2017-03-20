@@ -125,6 +125,21 @@
   tags:
     - rancher-host
 
+- name: Install NFS on docker hosts
+  hosts: tag_Docker_True
+  tasks:
+    - name: Intall NFS
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+        state: present
+      become: true
+      become_method: sudo
+      with_items:
+        - nfs-common
+  tags:
+    - rancher-host
+
 - name: Install Kubenetes Rancher hosts
   hosts: tag_Name_kubernetes_host
   roles:
