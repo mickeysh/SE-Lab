@@ -140,6 +140,7 @@
   tags:
     - rancher-host
 
+# install something
 - name: Install Kubenetes Rancher hosts
   hosts: tag_Name_kubernetes_host
   roles:
