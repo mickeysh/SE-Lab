@@ -29,7 +29,7 @@
     timeout: 320
     state: started
 
-- name: Rancher Host | Install Kubernetes | Get Kubernetes project template
+- name: Rancher Host | Install Rancher | Get project template
   uri:
     method: GET
     url: "http://{{ rancher_server }}:{{ rancher_port }}/v2-beta/project?name={{ rancher_project_name }}"
@@ -65,6 +65,8 @@
 - name: Rancher Host | Install Rancher | Check if the rancher-agent is running
   command: docker ps -a
   register: containers
+  become: true
+  become_method: sudo
 
 - debug: var=rancher_token.json['registrationUrl']
 

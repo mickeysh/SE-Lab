@@ -77,13 +77,6 @@
       become: true
       become_method: sudo
 
-- name: Install Rancher on AWS hosts
-  hosts: tag_Docker_True
-  roles:
-    - docker
-  tags:
-    - docker
-
 - name: Install MySQL on the server
   hosts: tag_Name_mysql_server
   roles:
@@ -94,6 +87,7 @@
 - name: Install Rancher on the server
   hosts: tag_Name_rancher_master
   roles:
+    - docker
     - rancher-master
   tags:
     - rancher-master
@@ -101,6 +95,7 @@
 - name: Install default Rancher hosts
   hosts: tag_Name_rancher_host
   roles:
+    - docker
     - rancher-host
   tags:
     - rancher-host
@@ -113,17 +108,7 @@
         project_name: kubernetes
       }
   tags:
-    - rancher-host
-
-- name: Install Kubenetes Rancher hosts
-  hosts: tag_Name_kubernetes_host
-  tasks:
-    - name: Intall docker
-      shell: curl https://releases.rancher.com/install-docker/1.12.sh | sh
-      become: true
-      become_method: sudo
-  tags:
-    - rancher-host
+    - kubernetes-project
 
 - name: Install NFS on docker hosts
   hosts: tag_Docker_True
@@ -140,13 +125,16 @@
   tags:
     - rancher-host
 
-# install something
 - name: Install Kubenetes Rancher hosts
   hosts: tag_Name_kubernetes_host
   roles:
+    - {
+        role: docker,
+        docker_version: "1.12.6"
+      }
     - {
         role: rancher-host,
         rancher_project_name: kubernetes
       }
   tags:
-    - rancher-host
+    - kubernetes-hosts
