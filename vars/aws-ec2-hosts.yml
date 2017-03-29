@@ -5,6 +5,7 @@ rancher_hosts:
     image: "{{ linux_image_id }}"
     assign_public_ip: true
     keypair: "{{instances_keypair}}"
+    profile_name: null
     group: ['ssh','web','rancher','ping']
     vpc_subnet_id: "{{subnet_id}}"
     instance_tags:
@@ -24,11 +25,37 @@ kubernetes_hosts:
     group: ['ssh','web','rancher','ping']
     vpc_subnet_id: "{{subnet_id}}"
     instance_tags:
-        Name: kubernetes_host
+        Name: kubernetes_data
         Docker: yes
     exact_count: 3
     count_tag:
-        Name: kubernetes_host
+        Name: kubernetes_data
+  - instance_type: t2.micro
+    image: "{{ linux_image_id }}"
+    assign_public_ip: true
+    keypair: "{{instances_keypair}}"
+    profile_name: "Rancher_Kubernetes_Host"
+    group: ['ssh','web','rancher','ping']
+    vpc_subnet_id: "{{subnet_id}}"
+    instance_tags:
+        Name: kubernetes_orchestration
+        Docker: yes
+    exact_count: 2
+    count_tag:
+        Name: kubernetes_orchestration
+  - instance_type: t2.micro
+    image: "{{ linux_image_id }}"
+    assign_public_ip: true
+    keypair: "{{instances_keypair}}"
+    profile_name: "Rancher_Kubernetes_Host"
+    group: ['ssh','web','rancher','ping']
+    vpc_subnet_id: "{{subnet_id}}"
+    instance_tags:
+        Name: kubernetes_compute
+        Docker: yes
+    exact_count: 1
+    count_tag:
+        Name: kubernetes_compute
 
 # EC2 Rancher master list
 rancher_masters:
@@ -36,6 +63,7 @@ rancher_masters:
     image: "{{ linux_image_id }}"
     assign_public_ip: true
     keypair: "{{instances_keypair}}"
+    profile_name: null
     group: ['ssh','web','rancher','ping','rancher_master']
     vpc_subnet_id: "{{subnet_id}}"
     instance_tags:
@@ -51,6 +79,7 @@ mysql_server:
     image: "{{ linux_image_id }}"
     assign_public_ip: true
     keypair: "{{instances_keypair}}"
+    profile_name: null
     group: ['ssh','web','mysql','ping']
     vpc_subnet_id: "{{subnet_id}}"
     instance_tags:
