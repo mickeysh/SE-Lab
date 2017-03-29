@@ -1,0 +1,18 @@
+---
+# tasks file for aws-iam
+- name: "AWS | Provision IAM role | Create IAM role"
+  iam:
+    iam_type: role
+    name: "{{ iam_group_name }}"
+    state: present
+    aws_access_key: "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+
+
+- name: "AWS | Provision IAM role | Create IAM role policy"
+  iam_policy:
+    iam_type: role
+    iam_name: "{{ iam_group_name }}"
+    policy_name: test1
+    state: present
+    policy_document: "{{ role_path }}/files/iam-policy.json"
