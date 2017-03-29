@@ -20,6 +20,7 @@ kubernetes_hosts:
     image: "{{ linux_image_id }}"
     assign_public_ip: true
     keypair: "{{instances_keypair}}"
+    profile_name: "Rancher_Kubernetes_Host"
     group: ['ssh','web','rancher','ping']
     vpc_subnet_id: "{{subnet_id}}"
     instance_tags:
