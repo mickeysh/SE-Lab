@@ -44,6 +44,7 @@
 - set_fact:
     rancher_project_id: "{{ rancher_project_url.json.data.0.id }}"
 
+# Get the registration token for the requested projectid
 - name: Rancher Host | Install Rancher | Return the registration token URL of Rancher server
   uri:
     method: POST
@@ -55,6 +56,7 @@
   retries: 10
   delay: 60
 
+# Get the registration token for the requested projectid
 - name: Rancher Host | Install Rancher | Return the registration URL of Rancher server
   uri:
     method: GET
@@ -80,7 +82,11 @@
         - /var/run/docker.sock:/var/run/docker.sock
         - /var/lib/rancher:/var/lib/rancher
       command: "{{ rancher_token.json['registrationUrl'] }}"
+      env:
+        CATTLE_HOST_LABELS="{{ rancher_host_label }}"
       state: started
+  become: true
+  become_method: sudo
   when: "{{ 'rancher-agent' not in containers.stdout }}"
 
 - name: Wait for the Rancher agent to start

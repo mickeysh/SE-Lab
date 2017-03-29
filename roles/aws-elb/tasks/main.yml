@@ -27,8 +27,6 @@
       "tag:Name": rancher_master
   register: instances_id_list
 
-- debug: var=instances_id_list
-
 - name: AWS | Provision ELB | Adding EC2 instance(s) to the ELB
   ec2_elb:
     region: "{{ vpc_region }}"

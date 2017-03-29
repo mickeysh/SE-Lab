@@ -2,7 +2,7 @@
 # defaults file for rancher-kubernetes
 rancher_server: 127.0.0.1
 rancher_port: 8080
-project_name: kubernetes
+project_name: kubernetes_aws
 is_public: true
 external_id: catalog://library:project*cattle:0
 cloud_provider: aws

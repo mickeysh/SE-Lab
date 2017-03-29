@@ -33,8 +33,8 @@
       "templateId": "library:infra*scheduler"
     }
   ],
-  "description": "test",
+  "description": "kubernetes_aws",
   "externalId": "catalog://library:project*cattle:0",
-  "name": "test",
-  "isPublic": false
+  "name": "kubernetes_aws",
+  "isPublic": "True"
 }

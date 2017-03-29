@@ -8,13 +8,51 @@
 - name: Kubernetes Host | Install Kubernetes | Get Kubernetes project template
   uri:
     method: GET
-    url: "http://{{ rancher_server }}:{{ rancher_port }}/v2-beta/projectTemplates?name=kubernetes"
+    url: "http://{{ rancher_server }}:{{ rancher_port }}/v2-beta/projectTemplates?name={{ project_name }}"
     return_content: yes
   register: rancher_token_url
+  ignore_errors: yes
 
 - name: Kubernetes Host | Install Kubernetes | Save the K8S project template
   set_fact:
     k8s_template: "{{ rancher_token_url['json']['data'][0]['id'] }}"
+  when: rancher_token_url['json']['data'] != []
+
+- name: Kubernetes Host | Install Kubernetes | Delete Rancher K8S project
+  uri:
+    method: POST
+    status_code: 202
+    body_format: json
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    url: "http://{{ rancher_server }}:{{ rancher_port }}/v2-beta/projecttemplates/{{ k8s_template }}/?action=remove"
+  when: rancher_token_url['json']['data'] != []
+
+
+- name: Kubernetes Host | Install Kubernetes | Create a Rancher K8S project
+  template:
+    src: project_template.j2
+    dest: "{{ role_path }}/files/project_template.json"
+
+- set_fact:
+    userdata: "{{ lookup('file', './roles/rancher-kubernetes/files/project_template.json')}}"
+
+- name: Kubernetes Host | Install Kubernetes | Create a Rancher K8S project
+  uri:
+    method: POST
+    status_code: 201
+    body: "{{ userdata }}"
+    body_format: json
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    url: http://{{ rancher_server }}:{{ rancher_port }}/v2-beta/projecttemplates
+  register: create_project
+
+- name: Kubernetes Host | Install Kubernetes | Save the K8S project template
+  set_fact:
+    k8s_template: "{{ create_project['json']['id'] }}"
 
 - name: Kubernetes Host | Install Kubernetes | Create a Rancher K8S project
   uri:
