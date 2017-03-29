@@ -62,7 +62,11 @@
   tags:
     - aws
 
+- name: Refresh EC2 dynamic inventory
+  hosts: localhost
   tasks:
+    - name: Wait before dynmaic inventory refresh
+      wait_for: timeout=60
     - name: Refresh EC2 dynamic inventory
       shell: /etc/ansible/ec2.py --refresh-cache
     - name: Wait for the dynmaic inventory refresh
@@ -126,7 +130,7 @@
     - rancher-host
 
 - name: Install Kubenetes Rancher hosts
-  hosts: tag_Name_kubernetes_host
+  hosts: tag_Name_kubernetes_data
   roles:
     - {
         role: docker,
@@ -134,7 +138,38 @@
       }
     - {
         role: rancher-host,
-        rancher_project_name: kubernetes
+        rancher_project_name: kubernetes_aws,
+        rancher_host_label: 'etcd=true'
+      }
+  tags:
+    - kubernetes-hosts
+
+- name: Install Kubenetes Rancher hosts
+  hosts: tag_Name_kubernetes_orchestration
+  roles:
+    - {
+        role: docker,
+        docker_version: "1.12.6"
+      }
+    - {
+        role: rancher-host,
+        rancher_project_name: kubernetes_aws,
+        rancher_host_label: 'orchestration=true'
+      }
+  tags:
+    - kubernetes-hosts
+
+- name: Install Kubenetes Rancher hosts
+  hosts: tag_Name_kubernetes_compute
+  roles:
+    - {
+        role: docker,
+        docker_version: "1.12.6"
+      }
+    - {
+        role: rancher-host,
+        rancher_project_name: kubernetes_aws,
+        rancher_host_label: 'compute=true'
       }
   tags:
     - kubernetes-hosts
